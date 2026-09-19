@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# env
+.env
+.env.*
+!.env.example
+
+# datos locales de docker
+caddy-data/
+caddy-config/
+
+# logs
+*.log

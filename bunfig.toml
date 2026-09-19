@@ -1,0 +1,6 @@
+# Las pruebas viven junto al código en src/, igual que en disalud-org (donde
+# `[test] root = "lib"`). Acotar la raíz evita que `bun test` recoja ficheros de
+# dist/ o de node_modules.
+[test]
+root = "src"
+preload = ["./src/test-setup.ts"]

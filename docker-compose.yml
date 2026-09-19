@@ -1,0 +1,52 @@
+services:
+  ws:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "8080"
+      NODE_ENV: production
+    # No se publica al host: solo Caddy llega hasta aquí.
+    expose:
+      - "8080"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Margen para que el apagado ordenado cierre los sockets con calma.
+    stop_grace_period: 30s
+    networks: [disalud]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      ws:
+        condition: service_healthy
+    networks: [disalud]
+
+# Sin servicio de Redis: el servidor no guarda nada. Los avisos pendientes viven
+# en el KV de disalud-org, que puede garantizarlos aunque esto esté caído.
+# Cuando haga falta escalar a varias instancias, se añade aquí un `redis` y se
+# define REDIS_URL: el adapter se activa solo (ver src/lib/redis.ts).
+
+networks:
+  disalud:
+
+volumes:
+  caddy-data:
+  caddy-config:
