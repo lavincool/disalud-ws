@@ -136,6 +136,10 @@ sudo apt-get update && sudo apt-get install -y cloudflared
 Ese repositorio usa la suite `any`, así que sirve igual en 26.04 que en
 cualquier otra versión.
 
+> Esta sección deja el túnel funcionando. Para el detalle —formato deb822,
+> ajustes de la zona que afectan a Socket.IO, verificación y diagnóstico—,
+> ve a [cloudflared.md](cloudflared.md).
+
 ## 6. Crear el túnel
 
 ### Opción A — desde el panel de Cloudflare (recomendada)

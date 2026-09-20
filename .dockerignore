@@ -9,3 +9,4 @@ dist
 test
 README.md
 DESPLIEGUE.md
+cloudflared.md

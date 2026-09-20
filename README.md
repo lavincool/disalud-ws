@@ -9,6 +9,8 @@ Sustituye al polling de 3 segundos que vivía en `HeaderNavbar.tsx` del repo
 
 - **Para desplegarlo**, ve a [DESPLIEGUE.md](DESPLIEGUE.md): Ubuntu 26.04,
   Docker Compose y Cloudflare Tunnel, paso a paso.
+- **Para el túnel en detalle**, ve a [cloudflared.md](cloudflared.md):
+  instalación en Ubuntu 26.04, ajustes de la zona y diagnóstico.
 - **Para trabajar en él**, sigue con este documento.
 
 ## De un vistazo
