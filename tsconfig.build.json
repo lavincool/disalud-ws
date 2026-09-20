@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // El build corre sobre Node: los tipos de bun solo hacen falta para las
+    // pruebas, que no se empaquetan.
+    "types": ["node"]
+  },
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/test-setup.ts"]
+}
