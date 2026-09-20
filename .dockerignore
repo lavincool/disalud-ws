@@ -6,7 +6,6 @@ dist
 .env
 .env.*
 !.env.example
-caddy-data
-caddy-config
 test
 README.md
+DESPLIEGUE.md

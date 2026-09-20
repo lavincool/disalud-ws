@@ -1,52 +1,37 @@
+# Un único servicio: el proceso de Node con el servidor de Socket.IO.
+#
+# Aquí no hay reverse proxy ni terminación de TLS. De eso se encarga Cloudflare
+# Tunnel, que abre la conexión *desde* la máquina hacia Cloudflare y devuelve
+# dominio, HTTPS y certificado renovado solo, sin abrir ningún puerto de entrada
+# en el VPS. Ver DESPLIEGUE.md.
+
 services:
   ws:
     build: .
+    image: disalud-ws
     restart: unless-stopped
+
+    # Mismo fichero para dos cosas: las variables que recibe el contenedor y los
+    # ${...} que docker compose interpola aquí abajo.
     env_file: .env
     environment:
-      PORT: "8080"
       NODE_ENV: production
-    # No se publica al host: solo Caddy llega hasta aquí.
-    expose:
-      - "8080"
-    healthcheck:
-      test:
-        - CMD
-        - node
-        - -e
-        - "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+
+    # Se publica solo en la interfaz local (127.0.0.1): el único que necesita
+    # llegar es cloudflared, que corre en esta misma máquina. Así el puerto no
+    # queda accesible desde internet aunque el firewall del VPS esté abierto.
+    # Si cloudflared vive en otro contenedor con su propia red, pon
+    # HOST_BIND=0.0.0.0 en .env (ver la opción B de DESPLIEGUE.md).
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:${PORT:-8080}:${PORT:-8080}"
+
     # Margen para que el apagado ordenado cierre los sockets con calma.
     stop_grace_period: 30s
-    networks: [disalud]
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on:
-      ws:
-        condition: service_healthy
-    networks: [disalud]
+    # El healthcheck ya viene en la imagen (ver Dockerfile), así que
+    # `docker compose ps` muestra healthy/unhealthy sin configurar nada más.
 
 # Sin servicio de Redis: el servidor no guarda nada. Los avisos pendientes viven
 # en el KV de disalud-org, que puede garantizarlos aunque esto esté caído.
 # Cuando haga falta escalar a varias instancias, se añade aquí un `redis` y se
 # define REDIS_URL: el adapter se activa solo (ver src/lib/redis.ts).
-
-networks:
-  disalud:
-
-volumes:
-  caddy-data:
-  caddy-config:
