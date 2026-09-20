@@ -4,12 +4,12 @@
 # Node: engine.io y socket.io están mucho más rodados sobre Node, y este proceso
 # mantiene conexiones abiertas durante horas.
 
-FROM oven/bun:1.3.14-slim AS deps-prod
+FROM oven/bun:1.4.2-slim AS deps-prod
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
-FROM oven/bun:1.3.14-slim AS build
+FROM oven/bun:1.4.2-slim AS build
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
